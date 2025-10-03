@@ -3,7 +3,6 @@ import Toaster from 'react-hot-toast';
 import LandingPage from './Pages/LandingPage/LandingPage';
 import Login from './Pages/Auth/Login';
 import Signup from './Pages/Auth/Signup';
-import JobseekerDashboard from './Pages/JobSeeker/JobseekerDashboard';
 import JobDetails from './Pages/JobSeeker/JobDetails';
 import SavedJobs from './Pages/JobSeeker/SavedJobs';
 import UserProfile from './Pages/JobSeeker/UserProfile'
@@ -14,6 +13,7 @@ import EmployerProfilePage from './Pages/Employer/EmployerProfilePage'
 import ManageJobs from './Pages/Employer/ManageJobs';
 import Protectedroutes from './routes/Protectedroutes';
 import { AuthProvider } from "./context/Authcontext";
+import JobSeekerDashboard from './Pages/JobSeeker/JobSeekerDashboard';
 
 
 
@@ -28,7 +28,7 @@ const App = () => {
           <Route path='/signup' element={<Signup />} />
 
           {/* Job Seeker Routes */}
-          <Route path='/find-jobs' element={<JobseekerDashboard />} />
+          <Route path='/find-jobs' element={<JobSeekerDashboard/>} />
           <Route path='/job/:jobid' element={<JobDetails />} />
           <Route path='/saved-jobs' element={<SavedJobs />} />
           <Route path='/user-profile' element={<UserProfile />} />
