@@ -10,7 +10,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { validateEmail } from "../../utils/helper";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/Authcontext";
 import { API_PATHS } from "../../utils/apiPaths";
 import axiosInstance from "../../utils/axiosInstance";
 
