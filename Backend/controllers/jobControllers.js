@@ -1,4 +1,3 @@
-// controllers/jobController.js (ESM)
 import Job from "../models/Job.js";
 import User from "../models/User.js";
 import Application from "../models/Application.js";
@@ -18,7 +17,6 @@ export const createJob = async (req, res) => {
   }
 };
 
-// @desc    Get jobs with filters and saved/applied info
 export const getJobs = async (req, res) => {
   const {
     keyword,
@@ -41,9 +39,17 @@ export const getJobs = async (req, res) => {
   if (minSalary || maxSalary) {
     query.$and = [];
 
-    if (minSalary) query.$and.push({ salaryMax: { $gte: Number(minSalary) } });
-    if (maxSalary) query.$and.push({ salaryMin: { $lte: Number(maxSalary) } });
-    if (query.$and.length === 0) delete query.$and;
+    if (minSalary) {
+      query.$and.push({ salaryMax: { $gte: Number(minSalary) } });
+    }
+
+    if (maxSalary) {
+      query.$and.push({ salaryMin: { $lte: Number(maxSalary) } });
+    }
+
+    if (query.$and.length === 0) {
+      delete query.$and;
+    }
   }
 
   try {
@@ -56,15 +62,18 @@ export const getJobs = async (req, res) => {
     let appliedJobStatusMap = {};
 
     if (userId) {
+      // Saved Jobs
       const savedJobs = await SavedJob.find({ jobseeker: userId }).select("job");
       savedJobIds = savedJobs.map((s) => String(s.job));
 
+      // Applications
       const applications = await Application.find({ applicant: userId }).select("job status");
       applications.forEach((app) => {
         appliedJobStatusMap[String(app.job)] = app.status;
       });
     }
 
+    // Add isSaved and applicationStatus to each job
     const jobsWithExtras = jobs.map((job) => {
       const jobIdStr = String(job._id);
       return {
@@ -80,22 +89,31 @@ export const getJobs = async (req, res) => {
   }
 };
 
-// @desc    Get jobs for logged-in employer
+// @desc    Get jobs for logged in user (Employer can see posted jobs)
 export const getJobsEmployer = async (req, res) => {
   try {
     const userId = req.user._id;
-    if (req.user.role !== "employer") {
+    const { role } = req.user;
+
+    if (role !== "employer") {
       return res.status(403).json({ message: "Access denied" });
     }
 
+    // Get all jobs posted by employer
     const jobs = await Job.find({ company: userId })
       .populate("company", "name companyName companyLogo")
-      .lean();
+      .lean(); // .lean() makes jobs plain JS objects so we can add new fields
 
+    // Count applications for each job
     const jobsWithApplicationCounts = await Promise.all(
       jobs.map(async (job) => {
-        const applicationCount = await Application.countDocuments({ job: job._id });
-        return { ...job, applicationCount };
+        const applicationCount = await Application.countDocuments({
+          job: job._id,
+        });
+        return {
+          ...job,
+          applicationCount,
+        };
       })
     );
 
@@ -115,19 +133,27 @@ export const getJobById = async (req, res) => {
       "name companyName companyLogo"
     );
 
-    if (!job) return res.status(404).json({ message: "Job not found" });
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
 
     let applicationStatus = null;
+
     if (userId) {
       const application = await Application.findOne({
         job: job._id,
         applicant: userId,
       }).select("status");
 
-      if (application) applicationStatus = application.status;
+      if (application) {
+        applicationStatus = application.status;
+      }
     }
 
-    res.json({ ...job.toObject(), applicationStatus });
+    res.json({
+      ...job.toObject(),
+      applicationStatus,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -140,7 +166,9 @@ export const updateJob = async (req, res) => {
     if (!job) return res.status(404).json({ message: "Job not found" });
 
     if (job.company.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "Not authorized to update this job" });
+      return res
+        .status(403)
+        .json({ message: "Not authorized to update this job" });
     }
 
     Object.assign(job, req.body);
@@ -158,7 +186,9 @@ export const deleteJob = async (req, res) => {
     if (!job) return res.status(404).json({ message: "Job not found" });
 
     if (job.company.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "Not authorized to delete this job" });
+      return res
+        .status(403)
+        .json({ message: "Not authorized to delete this job" });
     }
 
     await job.deleteOne();
@@ -175,7 +205,9 @@ export const toggleCloseJob = async (req, res) => {
     if (!job) return res.status(404).json({ message: "Job not found" });
 
     if (job.company.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "Not authorized to close this job" });
+      return res
+        .status(403)
+        .json({ message: "Not authorized to close this job" });
     }
 
     job.isClosed = !job.isClosed;

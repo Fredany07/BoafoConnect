@@ -22,7 +22,8 @@ const app = express();
 // Middleware to handle CORS
 app.use(
   cors({
-    origin: "https://boafoconnect-2.onrender.com",
+    origin: "ttps://boafo-connect-me.vercel.app",
+
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
