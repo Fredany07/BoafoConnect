@@ -18,7 +18,7 @@ import {
   validateEmail,
   validatePassword,
 } from "../../utils/helper";
-import axiosInstance from "../../utils/axiosInstance";
+import axiosInstance from "../../utils/axiosInstance"; // Make sure baseURL is set
 import { API_PATHS } from "../../utils/apiPaths";
 import uploadImage from "../../utils/uploadImage";
 import { useAuth } from "../../context/Authcontext";
@@ -42,15 +42,10 @@ const SignUp = () => {
     success: false,
   });
 
-  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Clear error when user starts typing
     if (formState.errors[name]) {
       setFormState((prev) => ({
         ...prev,
@@ -83,7 +78,6 @@ const SignUp = () => {
 
       setFormData((prev) => ({ ...prev, avatar: file }));
 
-      // Create preview
       const reader = new FileReader();
       reader.onload = (e) => {
         setFormState((prev) => ({
@@ -105,7 +99,6 @@ const SignUp = () => {
       avatar: "",
     };
 
-    // Remove empty errors
     Object.keys(errors).forEach((key) => {
       if (!errors[key]) delete errors[key];
     });
@@ -124,7 +117,6 @@ const SignUp = () => {
     try {
       let avatarUrl = "";
 
-      // Upload image if present
       if (formData.avatar) {
         const imgUploadRes = await uploadImage(formData.avatar);
         avatarUrl = imgUploadRes.imageUrl || "";
@@ -138,7 +130,6 @@ const SignUp = () => {
         avatar: avatarUrl || "",
       });
 
-      // Handle successful registration
       setFormState((prev) => ({
         ...prev,
         loading: false,
@@ -151,7 +142,6 @@ const SignUp = () => {
       if (token) {
         login(response.data, token);
 
-        // Redirect based on role
         setTimeout(() => {
           window.location.href =
             formData.role === "employer" ? "/employer-dashboard" : "/find-jobs";
@@ -195,6 +185,9 @@ const SignUp = () => {
       </div>
     );
   }
+
+  
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
