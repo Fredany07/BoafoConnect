@@ -7,7 +7,4 @@ export default defineConfig({
     react({ jsxRuntime: "automatic" }),
     tailwindcss(),
   ],
-  build: {
-    outDir: 'dist'  // <-- explicitly set output folder
-  }
 })

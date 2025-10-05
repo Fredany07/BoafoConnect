@@ -22,7 +22,7 @@ const app = express();
 // Middleware to handle CORS
 app.use(
   cors({
-    origin: "*",
+    origin: "https://boafoconnect-2.onrender.com",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
