@@ -22,7 +22,7 @@ const app = express();
 // Middleware to handle CORS
 app.use(
   cors({
-    origin: "ttps://boafo-connect-me.vercel.app",
+    origin: "https://boafo-connect-me.vercel.app",
 
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
